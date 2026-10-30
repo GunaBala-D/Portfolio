@@ -2,7 +2,7 @@ import { ArchitectureFigure } from '../components/diagram/ArchitectureFigure';
 import { workSystemsArch } from '../components/diagram/specs';
 import { CountUp, RadialGauge } from '../components/Metrics';
 import { Reveal } from '../components/Reveal';
-import { SectionHead } from '../components/SectionHead';
+import { SectionBar } from '../components/Section';
 import { Timeline } from '../components/Timeline';
 import { anomalyMetrics, education, experience } from '../data/profile';
 import type { Stage } from '../data/projects';
@@ -20,76 +20,102 @@ const WORK_STAGES: Stage[] = [
 export function Experience() {
   const [current, ...earlier] = experience;
   return (
-    <section className="section" id="experience" aria-labelledby="experience-title">
-      <div className="container">
-        <SectionHead
-          index="02"
-          label="Experience"
-          id="experience-title"
-          title={<>Applied AI/ML for <span className="grad-text">internal business operations</span>.</>}
-          lede="LLM, retrieval and anomaly-detection systems at Srikesh Infotech, alongside production ERP work."
-        />
+    <section className="section" id="experience" data-choreo aria-labelledby="experience-title">
+      <span className="section__rule" data-draw-rule aria-hidden="true" />
+      <div className="frame">
+        <span className="tick tick--half tick--tl" data-draw-tick aria-hidden="true" />
+        <span className="tick tick--half tick--tr" data-draw-tick aria-hidden="true" />
+        <SectionBar index="02" label="Experience" note={current?.period} />
+
+        <div className="xp-band">
+          <div className="section__head section__head--center">
+            <Reveal as="p" className="hud-label accent-ink">
+              Currently at Srikesh Infotech
+            </Reveal>
+            <Reveal as="h2" className="h-section" id="experience-title">
+              Applied AI/ML for <span className="serif">internal business operations</span>.
+            </Reveal>
+            <Reveal as="p" className="lede">
+              LLM, retrieval and anomaly-detection systems at Srikesh Infotech, alongside production ERP work.
+            </Reveal>
+          </div>
+        </div>
+
+        {current?.highlights && (
+          <ul role="list" className="ruled stats" data-reveal-group>
+            {current.highlights.map((h) => (
+              <li key={h.label} className="stat" data-reveal>
+                <CountUp value={h.value} className="stat__value display" />
+                <span className="stat__label">{h.label}</span>
+              </li>
+            ))}
+            <li className="stat stat--gauge" data-reveal>
+              <RadialGauge value={89} display="~89%" label="" size={86} />
+              <span className="stat__label">anomaly-detection F1 after grid and random search tuning</span>
+            </li>
+          </ul>
+        )}
 
         <Reveal className="tl-wrap">
           <Timeline />
         </Reveal>
 
         {current && (
-          <Reveal as="article" className="role role--current glass glass--edge">
-            <header className="role__head">
-              <div>
-                <h3 className="role__title">{current.title}</h3>
-                <p className="role__company">
-                  {current.company}
-                  {current.location && <span className="muted"> · {current.location}</span>}
-                </p>
-              </div>
-              <p className="role__period mono">{current.period}</p>
-            </header>
-            <p className="role__summary">{current.summary}</p>
-
-            {current.highlights && (
-              <ul role="list" className="role__highlights">
-                {current.highlights.map((h) => (
-                  <li key={h.label}>
-                    <CountUp value={h.value} className="mono" />
-                    {h.label}
-                  </li>
-                ))}
-              </ul>
-            )}
-
+          <article className="role">
+            <div className="card-bar role__bar">
+              <p className="hud-label muted">Current role</p>
+              <p className="hud-label faint">{current.period}</p>
+            </div>
             <div className="role__grid">
-              <ul className="role__points">
-                {current.points.map((pt) => (
-                  <li key={pt}>{pt}</li>
-                ))}
-              </ul>
-
-              <aside className="evalcard glass" aria-labelledby="anomaly-eval-title">
-                <p className="eyebrow">Evaluation</p>
-                <h4 id="anomaly-eval-title" className="evalcard__title">
-                  Unsupervised anomaly detection
-                </h4>
-                <p className="evalcard__sub">Isolation Forest + Local Outlier Factor over 15,000+ daily log events</p>
-                <ul role="list" className="evalcard__gauges">
-                  {anomalyMetrics.map((m) => (
-                    <li key={m.label}>
-                      <RadialGauge value={m.value} display={`~${m.value}%`} label={m.label} size={92} />
-                    </li>
+              <div className="role__main">
+                <Reveal as="h3" className="role__title">
+                  {current.title}
+                </Reveal>
+                <Reveal as="p" className="role__company">
+                  {current.company}
+                  {current.location && <span className="faint"> · {current.location}</span>}
+                </Reveal>
+                <Reveal as="p" className="role__summary">
+                  {current.summary}
+                </Reveal>
+                <ul className="role__points">
+                  {current.points.map((pt) => (
+                    <Reveal as="li" key={pt}>
+                      {pt}
+                    </Reveal>
                   ))}
                 </ul>
-                <p className="evalcard__note">
-                  Approximate values after grid and random search tuning, as reported on my resume.
-                </p>
-                <div className="evalcard__impact">
-                  <span className="mono">40–50%</span>
-                  <span>estimated reduction in manual triage time after re-architecting a script-based ML tool into a FastAPI microservice on AWS EC2</span>
-                </div>
+              </div>
+
+              <aside className="evalcard" aria-labelledby="anomaly-eval-title">
+                <Reveal className="evalcard__inner">
+                  <p className="hud-label muted">Evaluation</p>
+                  <h4 id="anomaly-eval-title" className="evalcard__title">
+                    Unsupervised anomaly detection
+                  </h4>
+                  <p className="evalcard__sub">Isolation Forest + Local Outlier Factor over 15,000+ daily log events</p>
+                  <ul role="list" className="evalcard__gauges">
+                    {anomalyMetrics.map((m) => (
+                      <li key={m.label}>
+                        <RadialGauge value={m.value} display={`~${m.value}%`} label={m.label} size={92} />
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="evalcard__note">
+                    Approximate values after grid and random search tuning, as reported on my resume.
+                  </p>
+                  <div className="evalcard__impact">
+                    <span className="evalcard__impact-value display">40–50%</span>
+                    <span>
+                      estimated reduction in manual triage time after re-architecting a script-based ML tool into a
+                      FastAPI microservice on AWS EC2
+                    </span>
+                  </div>
+                </Reveal>
               </aside>
             </div>
 
-            <div className="role__figure">
+            <Reveal className="role__figure">
               <ArchitectureFigure
                 spec={workSystemsArch}
                 title="Systems I built at Srikesh Infotech"
@@ -97,7 +123,7 @@ export function Experience() {
                 stages={WORK_STAGES}
                 hasDashed
               />
-            </div>
+            </Reveal>
 
             {current.stack && (
               <ul className="tags role__stack" aria-label="Technologies used in this role">
@@ -108,38 +134,40 @@ export function Experience() {
                 ))}
               </ul>
             )}
-          </Reveal>
+          </article>
         )}
 
-        <div className="timeline">
+        <div className="ruled earlier" data-reveal-group>
           {earlier.map((r) => (
-            <Reveal as="article" key={r.company} className="role role--compact">
-              <header className="role__head">
-                <div>
-                  <h3 className="role__title">{r.title}</h3>
-                  <p className="role__company">{r.company}</p>
-                </div>
-                <p className="role__period mono">{r.period}</p>
-              </header>
-              <ul className="role__points">
-                {r.points.map((pt) => (
-                  <li key={pt}>{pt}</li>
-                ))}
-              </ul>
-            </Reveal>
-          ))}
-          <Reveal as="article" className="role role--compact">
-            <header className="role__head">
-              <div>
-                <h3 className="role__title">{education.degree}</h3>
-                <p className="role__company">
-                  {education.school} <span className="muted">· {education.location}</span>
-                </p>
+            <article key={r.company} className="earlier__item" data-reveal>
+              <div className="card-bar">
+                <p className="hud-label muted">Earlier</p>
+                <p className="hud-label faint">{r.period}</p>
               </div>
-              <p className="role__period mono">{education.period}</p>
-            </header>
-            <p className="role__summary">{education.note}</p>
-          </Reveal>
+              <div className="earlier__body">
+                <h3 className="h-card">{r.title}</h3>
+                <p className="role__company">{r.company}</p>
+                <ul className="role__points">
+                  {r.points.map((pt) => (
+                    <li key={pt}>{pt}</li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+          ))}
+          <article className="earlier__item" data-reveal>
+            <div className="card-bar">
+              <p className="hud-label muted">Education</p>
+              <p className="hud-label faint">{education.period}</p>
+            </div>
+            <div className="earlier__body">
+              <h3 className="h-card">{education.degree}</h3>
+              <p className="role__company">
+                {education.school} <span className="faint">· {education.location}</span>
+              </p>
+              <p className="role__summary">{education.note}</p>
+            </div>
+          </article>
         </div>
       </div>
     </section>

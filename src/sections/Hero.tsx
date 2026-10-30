@@ -1,91 +1,106 @@
+import { lazy, Suspense, useLayoutEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import gsap from 'gsap';
 import { ArrowRight, FileText, Github } from '../components/Icons';
-import { LatentSpace } from '../components/LatentSpace';
-import { CountUp, RadialGauge } from '../components/Metrics';
 import { profile } from '../data/profile';
 
-const SIGNALS = ['RAG', 'LangGraph', 'MCP', 'Claude', 'Ollama', 'pgvector', 'FastAPI', 'scikit-learn', 'YOLO'];
+const Galaxy = lazy(() => import('../components/galaxy/Galaxy'));
 
-const STATS = [
-  { value: '7', label: 'internal teams adopted the Accounting Co-Pilot I built' },
-  { value: '1,000+', label: 'business records grounding RAG answers on pgvector' },
-  { value: '15,000+', label: 'daily log events scored by my anomaly detection' },
-];
+const WORDMARK = profile.name.toUpperCase();
+
+// The full entrance plays once per page load; returning to the home page should not make people wait.
+let introPlayed = false;
 
 export function Hero() {
+  const root = useRef<HTMLElement>(null);
+
+  useLayoutEffect(() => {
+    const el = root.current;
+    const html = document.documentElement;
+    if (!el) return;
+    if (introPlayed || !html.hasAttribute('data-intro')) {
+      html.removeAttribute('data-intro');
+      return;
+    }
+    const ctx = gsap.context(() => {
+      const letters = gsap.utils.toArray<HTMLElement>('.wm-letter');
+      const lines = gsap.utils.toArray<HTMLElement>('[data-hero-line]');
+      gsap.set(letters, { opacity: 0, yPercent: 26, filter: 'blur(10px)' });
+      gsap.set(lines, { autoAlpha: 0, y: 24, filter: 'blur(8px)' });
+      const tl = gsap.timeline({
+        onComplete: () => {
+          introPlayed = true;
+          html.removeAttribute('data-intro');
+        },
+      });
+      tl.to(letters[0]!, { opacity: 1, yPercent: 0, filter: 'blur(0px)', duration: 0.7, ease: 'power3.out' }, 0.05)
+        .to(
+          letters.slice(1),
+          { opacity: 1, yPercent: 0, filter: 'blur(0px)', duration: 0.75, ease: 'power3.out', stagger: 0.05 },
+          0.4,
+        )
+        .to(
+          lines,
+          { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out', stagger: 0.09, clearProps: 'opacity,visibility,transform,filter' },
+          0.95,
+        );
+    }, el);
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section className="hero" aria-labelledby="hero-title">
-      <div className="container hero__grid">
-        <div className="hero__copy">
-          <p className="hero__badge hero-in" style={{ ['--i' as string]: 0 }}>
-            <span className="hero__avatar">
-              <img src="/images/guna-bala-cutout-200.png" alt="" width={200} height={200} decoding="async" />
-              <span className="hero__dot" aria-hidden="true" />
+    <section ref={root} className="hero" id="top" aria-labelledby="hero-title">
+      <div className="hero__stage">
+        <Suspense fallback={null}>
+          <Galaxy eventsFrom={root} />
+        </Suspense>
+      </div>
+
+      <div className="hero__copy">
+        <div className="wm" aria-hidden="true">
+          {Array.from(WORDMARK).map((ch, i) => (
+            <span key={i} className={`wm-letter ${ch === ' ' ? 'wm-letter--space' : ''}`}>
+              {ch === ' ' ? ' ' : ch}
             </span>
-            {profile.role} · Srikesh Infotech
-            <span className="hero__badge-sep" aria-hidden="true" />
-            <span className="muted">{profile.location}</span>
-          </p>
-          <h1 id="hero-title" className="hero__title hero-in" style={{ ['--i' as string]: 1 }}>
-            <span className="hero__name">{profile.name}</span>
-            <span className="sr-only">, {profile.role}</span>
-          </h1>
-          <p className="hero__statement hero-in" style={{ ['--i' as string]: 2 }}>
-            I build LLM and ML systems that stay <span className="grad-text">grounded</span>: retrieval with citations,
-            agents with guardrails, and models evaluated against real metrics.
-          </p>
-          <p className="hero__support hero-in" style={{ ['--i' as string]: 3 }}>
-            Since September 2025 I&rsquo;ve built an Accounting Co-Pilot on Claude and Ollama, RAG over business records,
-            and anomaly detection for live operations. My five independent projects are published end to end, with
-            architecture, tests and documented limits.
-          </p>
-          <div className="hero__ctas hero-in" style={{ ['--i' as string]: 4 }}>
+          ))}
+        </div>
+
+        <h1 id="hero-title" className="hero__title" data-hero-line data-hero-text>
+          <span className="sr-only">
+            {profile.name}, {profile.role}.{' '}
+          </span>
+          AI/ML systems <span className="serif muted">that stay grounded.</span>
+        </h1>
+        <p className="hero__lede" data-hero-line data-hero-text>
+          I build retrieval with citations, agents with guardrails, and models evaluated against real metrics.
+        </p>
+        <div className="hero__ctas" data-hero-line>
+          <span className="hero__cta-col">
             <Link to="/#projects" className="btn btn--primary">
               Explore projects <ArrowRight />
             </Link>
-            <a href={profile.resume} className="btn" target="_blank" rel="noopener">
-              <FileText /> View resume
-            </a>
-            <a href={profile.github} className="btn hero__gh" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
-              <Github />
-            </a>
-          </div>
+            <span className="hud-label faint hero__under">Five case studies · code on GitHub</span>
+          </span>
+          <a href={profile.resume} className="btn" target="_blank" rel="noopener">
+            <FileText /> View resume
+          </a>
         </div>
-
-        <div className="hero__visual hero-in" style={{ ['--i' as string]: 2 }}>
-          <div className="hero__visual-frame glass glass--edge">
-            <LatentSpace />
-          </div>
-        </div>
-      </div>
-
-      <div className="container">
-        <ul role="list" className="hero__stats" aria-label="Highlights from my work">
-          {STATS.map((s, i) => (
-            <li key={s.label} className="hero__stat glass hero-in" style={{ ['--i' as string]: 5 + i * 0.6 }}>
-              <CountUp value={s.value} className="hero__stat-value" />
-              <span className="hero__stat-label">{s.label}</span>
-            </li>
-          ))}
-          <li className="hero__stat hero__stat--gauge glass hero-in" style={{ ['--i' as string]: 6.8 }}>
-            <RadialGauge value={89} display="~89%" label="" size={84} />
-            <span className="hero__stat-label">
-              anomaly-detection F1 after grid and random search tuning (~90% precision, ~88% recall)
-            </span>
-          </li>
-        </ul>
-
-        <div className="ticker hero-in" style={{ ['--i' as string]: 8 }} aria-label="Core stack">
-          <div className="ticker__track">
-            {[0, 1].map((dup) => (
-              <ul role="list" key={dup} aria-hidden={dup === 1 ? true : undefined}>
-                {SIGNALS.map((s) => (
-                  <li key={s}>{s}</li>
-                ))}
-              </ul>
-            ))}
-          </div>
-        </div>
+        <p className="hero__alt" data-hero-line data-hero-text>
+          Want to talk? <a className="link-ink" href={`mailto:${profile.email}`}>Email me</a> or{' '}
+          <a className="link-ink" href={profile.linkedin} target="_blank" rel="noopener noreferrer">
+            connect on LinkedIn
+          </a>
+          .
+        </p>
+        <p className="hero__meta hud-label muted" data-hero-line>
+          <a className="hero__meta-link" href={profile.github} target="_blank" rel="noopener noreferrer">
+            <Github /> Code on GitHub
+          </a>
+          <span>
+            {profile.role} · Srikesh Infotech
+          </span>
+          <span>{profile.location}</span>
+        </p>
       </div>
     </section>
   );

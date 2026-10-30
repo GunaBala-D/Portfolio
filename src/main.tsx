@@ -1,8 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource-variable/geist-mono';
 import '@fontsource-variable/inter';
-import '@fontsource-variable/jetbrains-mono';
-import '@fontsource-variable/space-grotesk';
+import '@fontsource/instrument-serif/400-italic.css';
 import './styles/tokens.css';
 import './styles/global.css';
 import './styles/layout.css';

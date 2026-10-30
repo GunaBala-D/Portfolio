@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useInView } from '../hooks/useInView';
 
 function useReducedMotion() {
@@ -48,27 +48,18 @@ type GaugeProps = { value: number; label: string; display?: string; size?: numbe
 
 /** Circular gauge for a percentage metric; the number is always printed, so colour carries no meaning alone. */
 export function RadialGauge({ value, label, display, size = 112 }: GaugeProps) {
-  const id = useId().replace(/:/g, '');
   const [ref, inView] = useInView<SVGSVGElement>({ once: true, rootMargin: '0px 0px -10% 0px' });
   const r = 42;
   const c = 2 * Math.PI * r;
   return (
     <figure className="gauge" style={{ width: size }}>
       <svg ref={ref} viewBox="0 0 100 100" className={`gauge__svg ${inView ? 'is-in' : ''}`} aria-hidden="true">
-        <defs>
-          <linearGradient id={`${id}-g`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#a78bfa" />
-            <stop offset="55%" stopColor="#22d3ee" />
-            <stop offset="100%" stopColor="#34d399" />
-          </linearGradient>
-        </defs>
         <circle cx="50" cy="50" r={r} className="gauge__track" />
         <circle
           cx="50"
           cy="50"
           r={r}
           className="gauge__value"
-          stroke={`url(#${id}-g)`}
           strokeDasharray={c}
           style={{ ['--off' as string]: `${c * (1 - value / 100)}`, ['--c' as string]: `${c}` }}
           transform="rotate(-90 50 50)"
