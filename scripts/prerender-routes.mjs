@@ -7,7 +7,8 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
 
-const source = await readFile(join(root, 'src/data/projects.ts'), 'utf8');
+// Normalise line endings: the field patterns below expect LF, and Git may check the file out as CRLF on Windows.
+const source = (await readFile(join(root, 'src/data/projects.ts'), 'utf8')).replace(/\r\n/g, '\n');
 const template = await readFile(join(dist, 'index.html'), 'utf8');
 
 const unquote = (s) => s.replace(/\\'/g, "'").replace(/\\u2019/g, '’');

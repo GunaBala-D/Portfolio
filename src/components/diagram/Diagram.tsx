@@ -151,13 +151,8 @@ export function Diagram({ spec, title, description, className, decorative, child
           <path d="M0 1 L9 5 L0 9" fill="none" stroke="var(--line-strong)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
         </marker>
         <marker id={`${uid}-arrow-a`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M0 1 L9 5 L0 9" fill="none" stroke="var(--cyan)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M0 1 L9 5 L0 9" fill="none" stroke="var(--accent)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
         </marker>
-        <linearGradient id={`${uid}-flow`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={spec.w} y2="0">
-          <stop offset="0%" stopColor="#a78bfa" />
-          <stop offset="55%" stopColor="#22d3ee" />
-          <stop offset="100%" stopColor="#34d399" />
-        </linearGradient>
       </defs>
 
       {spec.groups?.map((g) => (
@@ -184,7 +179,6 @@ export function Diagram({ spec, title, description, className, decorative, child
               d={d}
               className="dg-edge__line"
               markerEnd={`url(#${uid}-arrow${e.flow ? '-a' : ''})`}
-              style={e.flow ? { stroke: `url(#${uid}-flow)` } : undefined}
             />
             {e.flow && <path d={d} className="dg-edge__pulse" pathLength={100} style={{ animationDelay: `${delay}s` }} />}
             {e.label && e.labelAt && (

@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Award, External } from '../components/Icons';
-import { Reveal } from '../components/Reveal';
-import { SectionHead } from '../components/SectionHead';
+import { Section } from '../components/Section';
 import { certifications, profile } from '../data/profile';
 
 const PRINCIPLES = [
@@ -33,95 +32,99 @@ const PRINCIPLES = [
 
 export function About() {
   return (
-    <section className="section" id="about" aria-labelledby="about-title">
-      <div className="container">
-        <SectionHead index="04" label="About" id="about-title" title={<>How I approach <span className="grad-text">AI/ML engineering</span>.</>} />
-
-        <div className="about">
-          <Reveal className="about__text">
-            <figure className="portrait">
-              <div className="portrait__stage">
-                <img
-                  src="/images/guna-bala-cutout-720.png"
-                  alt="Portrait of Guna Bala D"
-                  width={720}
-                  height={720}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <figcaption className="portrait__tag glass">
-                <span className="portrait__live" aria-hidden="true" />
-                <span>
-                  <strong>{profile.name}</strong>
-                  <span className="mono">
-                    {profile.role} · {profile.location}
-                  </span>
-                </span>
-              </figcaption>
-            </figure>
-            <p>
-              I&rsquo;m an AI/ML Engineer at Srikesh Infotech in Puducherry, India. Since September 2025 I&rsquo;ve built
-              LLM applications, retrieval pipelines and anomaly detection for internal business operations, and
-              maintained production Odoo ERP modules alongside that work.
-            </p>
-            <p>
-              I work across the whole system: ingestion and OCR, retrieval and re-ranking, agent workflows with LangGraph
-              and MCP, classical ML evaluation, and the FastAPI services and interfaces that make models usable.
-            </p>
-            <p>
-              I hold a B.Tech in Information Technology from Rajiv Gandhi College of Engineering and Technology (2021–2025)
-              and work in Tamil and English.
-            </p>
-          </Reveal>
-
-          <ol className="principles" role="list">
-            {PRINCIPLES.map((p, i) => (
-              <Reveal as="li" key={p.title} className="principle glass" delay={i * 80}>
-                <span className="principle__n mono" aria-hidden="true">
-                  0{i + 1}
-                </span>
-                <div>
-                  <h3 className="principle__title">{p.title}</h3>
-                  <p className="principle__body">{p.body}</p>
-                  <p className="principle__ev">
-                    See{' '}
-                    {p.evidence.map((e, j) => (
-                      <span key={e.slug}>
-                        {j > 0 && ' and '}
-                        <Link to={`/projects/${e.slug}`}>{e.name}</Link>
-                      </span>
-                    ))}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-          </ol>
+    <Section
+      id="about"
+      index="04"
+      label="About"
+      note={profile.location}
+      title={
+        <>
+          How I approach <span className="serif">AI/ML engineering</span>.
+        </>
+      }
+    >
+      <div className="ruled about">
+        <figure className="portrait" data-reveal>
+          <img
+            src="/images/guna-bala-cutout-720.png"
+            alt="Portrait of Guna Bala D"
+            width={720}
+            height={720}
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption className="card-bar portrait__tag">
+            <span className="hud-label muted">{profile.name}</span>
+            <span className="hud-label faint">{profile.role}</span>
+          </figcaption>
+        </figure>
+        <div className="about__text" data-reveal>
+          <p className="about__lead">
+            I&rsquo;m an AI/ML Engineer at Srikesh Infotech in Puducherry, India. Since September 2025 I&rsquo;ve built
+            LLM applications, retrieval pipelines and anomaly detection for internal business operations, and maintained
+            production Odoo ERP modules alongside that work.
+          </p>
+          <p>
+            I work across the whole system: ingestion and OCR, retrieval and re-ranking, agent workflows with LangGraph
+            and MCP, classical ML evaluation, and the FastAPI services and interfaces that make models usable.
+          </p>
+          <p>
+            I hold a B.Tech in Information Technology from Rajiv Gandhi College of Engineering and Technology (2021–2025)
+            and work in Tamil and English.
+          </p>
         </div>
-
-        <Reveal className="certs" as="div">
-          <div className="certs__head">
-            <h3 className="certs__title">Certifications</h3>
-            <a href={profile.certificatesFolder} className="text-link" target="_blank" rel="noopener noreferrer">
-              View Anthropic certificates <External />
-            </a>
-          </div>
-          <ul role="list" className="certs__list">
-            {certifications.map((c) => (
-              <li key={c.name} className="cert glass">
-                <Award className="cert__icon" />
-                <div>
-                  <p className="cert__name">{c.name}</p>
-                  <p className="cert__issuer">
-                    {c.issuer}
-                    {c.date && <span className="mono"> · {c.date}</span>}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Reveal>
       </div>
-    </section>
+
+      <ol className="ruled principles" role="list" data-reveal-group>
+        {PRINCIPLES.map((p, i) => (
+          <li key={p.title} className="principle" data-reveal>
+            <div className="card-bar">
+              <span className="hud-label muted">Principle</span>
+              <span className="hud-label faint" aria-hidden="true">
+                {String.fromCharCode(65 + i)}
+              </span>
+            </div>
+            <div className="principle__body">
+              <h3 className="h-card">{p.title}</h3>
+              <p className="muted">{p.body}</p>
+              <p className="principle__ev">
+                See{' '}
+                {p.evidence.map((e, j) => (
+                  <span key={e.slug}>
+                    {j > 0 && ' and '}
+                    <Link className="link-ink" to={`/projects/${e.slug}`}>
+                      {e.name}
+                    </Link>
+                  </span>
+                ))}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <div className="certs">
+        <div className="card-bar certs__bar">
+          <h3 className="hud-label muted certs__title">Certifications</h3>
+          <a href={profile.certificatesFolder} className="hud-label link-hud" target="_blank" rel="noopener noreferrer">
+            View Anthropic certificates <External />
+          </a>
+        </div>
+        <ul role="list" className="ruled certs__list" data-reveal-group>
+          {certifications.map((c) => (
+            <li key={c.name} className="cert" data-reveal>
+              <Award className="cert__icon" />
+              <div>
+                <p className="cert__name">{c.name}</p>
+                <p className="cert__issuer">
+                  {c.issuer}
+                  {c.date && <span className="mono"> · {c.date}</span>}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Section>
   );
 }

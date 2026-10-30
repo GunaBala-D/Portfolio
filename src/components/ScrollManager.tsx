@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { scrollToTarget } from '../motion/smooth';
 
 /**
  * Scrolls to the hash target after navigation (including repeat clicks on the same hash),
@@ -19,8 +20,7 @@ export function ScrollManager() {
       const raf = requestAnimationFrame(() => {
         const el = document.getElementById(id);
         if (!el) return;
-        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        el.scrollIntoView({ behavior: samePage && !reduce ? 'smooth' : 'auto', block: 'start' });
+        scrollToTarget(el, !samePage);
         if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
         el.focus({ preventScroll: true });
       });
@@ -28,7 +28,7 @@ export function ScrollManager() {
     }
 
     if (!samePage) {
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      scrollToTarget(0, true);
       document.getElementById('main')?.focus({ preventScroll: true });
     }
   }, [pathname, hash, key]);

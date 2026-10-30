@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArchitectureFigure } from '../components/diagram/ArchitectureFigure';
 import { ProjectCardArt } from '../components/diagram/ProjectVisuals';
@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, External, Github } from '../components/Icons';
 import { Reveal } from '../components/Reveal';
 import { getProject, projects, type Project } from '../data/projects';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { useChoreo } from '../motion/useChoreo';
 import NotFound from './NotFound';
 
 const TOC = [
@@ -51,23 +52,26 @@ function CaseStudy({ project: p }: { project: Project }) {
   usePageMeta(`${p.name} — Case study · Guna Bala D`, p.seo);
   const toc = p.screenshots ? [...TOC.slice(0, 3), { id: 'screens', label: 'Screenshots' }, ...TOC.slice(3)] : TOC;
   const active = useActiveSection(toc.map((t) => t.id));
+  const root = useRef<HTMLElement>(null);
+  useChoreo(root, [p.slug]);
   const arch = ARCH_SPECS[p.slug];
   const i = projects.findIndex((x) => x.slug === p.slug);
   const prev = projects[(i - 1 + projects.length) % projects.length]!;
   const next = projects[(i + 1) % projects.length]!;
 
   return (
-    <article className="cs" aria-labelledby="cs-title">
+    <article ref={root} className="cs frame" aria-labelledby="cs-title">
       <header className="cs-hero">
-        <div className="cs-hero__bg" aria-hidden="true" />
-        <div className="container cs-hero__grid">
+        <div className="cs-hero__grid">
           <div className="cs-hero__copy">
-            <Link to="/#projects" className="cs-back">
+            <Link to="/#projects" className="cs-back hud-label">
               <ArrowLeft /> All projects
             </Link>
-            <p className="eyebrow hero-in" style={{ ['--i' as string]: 0 }}>
-              <span className="eyebrow__index">{p.index}</span>
-              <span className="eyebrow__rule" aria-hidden="true" />
+            <p className="hud-label muted hero-in" style={{ ['--i' as string]: 0 }}>
+              <span className="faint">{p.index}</span>
+              <span className="section__slash faint" aria-hidden="true">
+                /
+              </span>
               Case study{p.alias ? ` · ${p.alias}` : ''}
             </p>
             <h1 id="cs-title" className="cs-hero__title hero-in" style={{ ['--i' as string]: 1 }}>
@@ -76,11 +80,11 @@ function CaseStudy({ project: p }: { project: Project }) {
             <p className="cs-hero__tagline hero-in" style={{ ['--i' as string]: 2 }}>
               {p.tagline}
             </p>
-            <div className="cs-hero__meta hero-in" style={{ ['--i' as string]: 3 }}>
-              <p className="cs-status mono">
-                <span aria-hidden="true" className="cs-status__dot" />
-                {p.status}
-              </p>
+            <p className="cs-status mono hero-in" style={{ ['--i' as string]: 3 }}>
+              <span aria-hidden="true" className="cs-status__dot" />
+              {p.status}
+            </p>
+            <div className="hero-in" style={{ ['--i' as string]: 3 }}>
               <div className="cs-hero__actions">
                 <a href={p.repo} className="btn btn--primary" target="_blank" rel="noopener noreferrer">
                   <Github /> View source on GitHub
@@ -100,13 +104,13 @@ function CaseStudy({ project: p }: { project: Project }) {
               ))}
             </ul>
           </div>
-          <div className="cs-hero__art glass glass--edge hero-in" style={{ ['--i' as string]: 2 }}>
+          <div className="cs-hero__art hero-in" style={{ ['--i' as string]: 2 }}>
             <ProjectCardArt slug={p.slug} />
           </div>
         </div>
       </header>
 
-      <section className="container cs-brief" aria-label="Overview, problem and solution">
+      <section className="cs-brief" aria-label="Overview, problem and solution">
         <Reveal className="cs-brief__item" id="overview">
           <h2 className="cs-label">Overview</h2>
           <p>{p.overview}</p>
@@ -124,7 +128,7 @@ function CaseStudy({ project: p }: { project: Project }) {
       </section>
 
       {arch && (
-        <section className="container cs-arch" aria-labelledby="architecture">
+        <section className="cs-arch" aria-labelledby="architecture">
           <Reveal>
             <h2 className="cs-h2" id="architecture">
               Architecture
@@ -140,7 +144,7 @@ function CaseStudy({ project: p }: { project: Project }) {
         </section>
       )}
 
-      <div className="container cs-body">
+      <div className="cs-body">
         <nav className="cs-toc" aria-label="On this page">
           <p className="cs-toc__title mono">On this page</p>
           <ol role="list">
@@ -175,7 +179,7 @@ function CaseStudy({ project: p }: { project: Project }) {
             </h2>
             <div className="decisions">
               {p.decisions.map((d, i) => (
-                <Reveal as="article" key={d.title} className="decision glass" delay={(i % 2) * 70}>
+                <Reveal as="article" key={d.title} className="decision" delay={(i % 2) * 70}>
                   <span className="decision__n mono" aria-hidden="true">
                     D{i + 1}
                   </span>
@@ -210,7 +214,7 @@ function CaseStudy({ project: p }: { project: Project }) {
             )}
 
             {p.comparison && (
-              <Reveal className="compare glass">
+              <Reveal className="compare">
                 <h3 className="cs-h3">{p.comparison.title}</h3>
                 <div className="compare__scroll" tabIndex={0} role="region" aria-label={p.comparison.title}>
                   <table>
@@ -246,7 +250,7 @@ function CaseStudy({ project: p }: { project: Project }) {
             )}
 
             {p.weights && (
-              <Reveal className="weights glass">
+              <Reveal className="weights">
                 <h3 className="cs-h3">{p.weights.title}</h3>
                 <ul role="list" className="weights__list">
                   {p.weights.rows.map((r) => (
@@ -283,7 +287,7 @@ function CaseStudy({ project: p }: { project: Project }) {
               <p className="cs-sub">From the project repository, showing the dashboard running on synthetic data.</p>
               <div className="shots">
                 {p.screenshots.map((s, i) => (
-                  <Reveal as="figure" key={s.src} className={`shot glass ${i === 0 ? 'shot--lead' : ''}`}>
+                  <Reveal as="figure" key={s.src} className={`shot ${i === 0 ? 'shot--lead' : ''}`}>
                     <img src={s.src} alt={s.alt} width={s.width} height={s.height} loading="lazy" decoding="async" />
                     <figcaption>{s.caption}</figcaption>
                   </Reveal>
@@ -306,7 +310,7 @@ function CaseStudy({ project: p }: { project: Project }) {
               Results &amp; learnings
             </h2>
             <div className="results">
-              <Reveal className="results__col glass">
+              <Reveal className="results__col">
                 <h3 className="cs-h3">What the work showed</h3>
                 <ul className="bullets">
                   {p.findings.map((f) => (
@@ -357,7 +361,7 @@ function CaseStudy({ project: p }: { project: Project }) {
         </div>
       </div>
 
-      <nav className="container cs-pager" aria-label="More projects">
+      <nav className="cs-pager" aria-label="More projects">
         <Link to={`/projects/${prev.slug}`} className="cs-pager__link">
           <span className="mono">
             <ArrowLeft /> Previous
